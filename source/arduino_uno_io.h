@@ -33,10 +33,8 @@ void pinMode(unsigned char arduino_pin_number, enum Mode mode);
  */
 enum Level digitalRead(unsigned char arduino_pin_number);
 
-/**
- * Writes the logic level of a digital pin in the Arduino UNO.
+/** Writes the logic level of a digital pin in the Arduino UNO.
  * Assumes the digital pin was set as OUTPUT via pinMode()
- *
  * @param arduino_pin_number A number from 0 to 13 that represents an arduino UNO's digital pins
  * @param level The logic level to set the pin, which can be either the LOW, or HIGH variants of the Level enum
  */

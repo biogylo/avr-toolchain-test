@@ -17,3 +17,8 @@ What I've done up to this point
 - A simple blink program (`main.c`)
 
 To run, update the relevant makefile constants and from the command line run `make`
+
+
+TODO
+- Add some unit testing to be run in the AVR
+- Add some unit testing to be run in the PC

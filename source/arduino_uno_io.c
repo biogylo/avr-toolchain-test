@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Title:       arduino_uno_io.h
+// Title:       arduino_uno_io.c
 // Description: The source file for an input and output abstraction
 //              C library for the Arduino UNO. It has basic input/output
 //              hardware abstraction for an Arduino UNO board with the
