@@ -7,10 +7,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "arduino_uno_io.h"
 
+#include "avr/interrupt.h"
+
+ISR_pin2
+{
+    digitalWrite(8, digitalRead(3));
+}
+
 void setup()
 {
+    enablePin2Interrupt();
+    enableInterrupts();
     pinMode(6, OUTPUT);
+    pinMode(7, OUTPUT);
     pinMode(8, OUTPUT);
+    pinMode(9, OUTPUT);
 }
 
 void loop()
@@ -19,14 +30,22 @@ void loop()
     for (long i = 0; i < 1000; i++)
     {
         digitalWrite(6, HIGH);
-        digitalWrite(8, HIGH);
+        digitalWrite(7, LOW);
     }
 
     // go to sleep for an arbitrary amount of time
     for (long i = 0; i < 1000; i++)
     {
         digitalWrite(6, LOW);
-        digitalWrite(8, LOW);
+        digitalWrite(7, HIGH);
+    }
+    if (analogRead(1) > 900)
+    {
+        digitalWrite(9, HIGH);
+    }
+    else
+    {
+        digitalWrite(9, LOW);
     }
 }
 

@@ -9,6 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "arduino_uno_io.h"
+#include <avr/sleep.h>
 
 // Address location of registers in the ATmega328p
 #define PINB 0x23
@@ -22,6 +23,18 @@
 #define PIND 0x29
 #define DDRD 0x2A
 #define PORTD 0x2B
+
+#define SREG 0x5F // Status register
+
+// Interrupt registers
+#define EICRA 0x69
+#define EIMSK 0x3D
+#define INT0 2
+// ADC Registers
+#define ADMUX 0x7C
+#define ADCH 0x79
+#define ADCL 0x78
+#define ADCSRA 0x7A
 
 // A struct that has the information necessary to represent a digital pin in the ATmega328P
 struct DigitalPin
@@ -63,18 +76,18 @@ static unsigned int get_pin_register_address(struct DigitalPin digital_pin)
 
 /**
  * @param digital_pin A DigitalPin struct
- * @returns The address number of the port register of the digital_pin
+ * @returns The address number of the data direction register of the digital_pin
  */
-static unsigned int get_port_register_address(struct DigitalPin digital_pin)
+static unsigned int get_data_direction_register_address(struct DigitalPin digital_pin)
 {
     return digital_pin.register_address + 1;
 };
 
 /**
  * @param digital_pin A DigitalPin struct
- * @returns The address number of the data direction register of the digital_pin
+ * @returns The address number of the port register of the digital_pin
  */
-static unsigned int get_data_direction_register_address(struct DigitalPin digital_pin)
+static unsigned int get_port_register_address(struct DigitalPin digital_pin)
 {
     return digital_pin.register_address + 2;
 };
@@ -178,3 +191,41 @@ enum Level digitalRead(unsigned char arduino_pin_number)
     unsigned int pin_register_address = get_pin_register_address(digital_pin);
     return read_register_bit(pin_register_address, digital_pin.offset);
 };
+void enablePin2Interrupt()
+{
+    pinMode(2, INPUT_TRISTATE);
+    // Sets pin2 (INT1) as an external interrupt on any logical change
+    write_register_bit(
+        EICRA,
+        2,
+        HIGH);
+    write_register_bit(
+        EICRA,
+        3,
+        LOW);
+    // Enable INT1 interrupt
+    write_register_bit(
+        EIMSK,
+        1,
+        HIGH);
+}
+void enableInterrupts()
+{
+    write_register_bit(
+        SREG,
+        7,
+        HIGH); // Globally enable interrupts in the MCU by setting 7th bit in SREG register
+}
+
+unsigned short analogRead(unsigned char analog_pin)
+{
+    *((volatile unsigned char *)ADCSRA) |= 0b10000000;             // enable ADC
+    *((volatile unsigned char *)ADMUX) |= 0b00000111 & analog_pin; // set desired analog pin
+    *((volatile unsigned char *)ADCSRA) |= 0b01000000;             // start conversion ADC
+    while (*((volatile unsigned char *)ADCSRA) & 0b01000000)
+    {
+        // wait until adc finishes
+    }
+    return *((volatile unsigned short *)ADCL);
+    return (*((volatile unsigned char *)ADCH) << 8) | *((volatile unsigned char *)ADCL);
+}

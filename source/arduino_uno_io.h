@@ -6,6 +6,7 @@
 // Email:       navarro.juan@uabc.edu.mx
 ///////////////////////////////////////////////////////////////////////////////
 
+#define ISR_pin2 ISR(INT1_vect)
 // An enumeration that represents the mode of an Arduino UNO pin.
 enum Mode
 {
@@ -39,3 +40,9 @@ enum Level digitalRead(unsigned char arduino_pin_number);
  * @param level The logic level to set the pin, which can be either the LOW, or HIGH variants of the Level enum
  */
 void digitalWrite(unsigned char arduino_pin_number, enum Level level);
+
+void enablePin2Interrupt(); // TODO: require a function pointer and bind it to the interrupt
+
+// Globally enables interrupts in the MCU
+void enableInterrupts();
+unsigned short analogRead(unsigned char analog_pin);
