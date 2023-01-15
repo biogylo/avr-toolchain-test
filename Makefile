@@ -4,7 +4,7 @@ ARDUINO_SERIAL_PORT=/dev/ttyUSB0
 all:
 	make clean
 	make compile
-	make info
+    make info
 	make launch
 
 compile: 

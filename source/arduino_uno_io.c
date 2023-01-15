@@ -1,8 +1,16 @@
-/*
-Basic hardware abstraction for arduino uno board with atmega328p
-*/
+///////////////////////////////////////////////////////////////////////////////
+// Title:       arduino_uno_io.h
+// Description: The source file for an input and output abstraction
+//              C library for the Arduino UNO. It has basic input/output
+//              hardware abstraction for an Arduino UNO board with the
+//              ATmega328p microcontroller
+// Author:      Juan Francisco Navarro
+// Email:       navarro.juan@uabc.edu.mx
+///////////////////////////////////////////////////////////////////////////////
+
 #include "arduino_uno_io.h"
-// Address location of registers in the atmega
+
+// Address location of registers in the ATmega328p
 #define PINB 0x23
 #define DDRB 0x24
 #define PORTB 0x25
@@ -15,14 +23,17 @@ Basic hardware abstraction for arduino uno board with atmega328p
 #define DDRD 0x2A
 #define PORTD 0x2B
 
-// Arduino digital pins
-
+// A struct that has the information necessary to represent a digital pin in the ATmega328P
 struct DigitalPin
 {
     unsigned int register_address;
     unsigned char offset;
 };
 
+/** This method abstracts away PINx register addresses by storing relevant information in the DigitalInfo struct
+ * @param arduino_pin_number A number from 0 to 13 that represents an arduino UNO's digital pin
+ * @returns A DigitalPin struct that has the information necessary to represent a digital pin in the ATmega328P
+ */
 static inline struct DigitalPin get_digital_pin_from_number(unsigned char arduino_pin_number)
 {
     // Assumes pin_number range is [0,13]
@@ -41,21 +52,38 @@ static inline struct DigitalPin get_digital_pin_from_number(unsigned char arduin
     return digital_pin;
 }
 
+/**
+ * @param digital_pin A DigitalPin struct
+ * @returns The address number of the pin register the digital_pin is in
+ */
 static unsigned int get_pin_register_address(struct DigitalPin digital_pin)
 {
     return digital_pin.register_address;
 };
 
+/**
+ * @param digital_pin A DigitalPin struct
+ * @returns The address number of the port register of the digital_pin
+ */
 static unsigned int get_port_register_address(struct DigitalPin digital_pin)
 {
     return digital_pin.register_address + 1;
 };
 
+/**
+ * @param digital_pin A DigitalPin struct
+ * @returns The address number of the data direction register of the digital_pin
+ */
 static unsigned int get_data_direction_register_address(struct DigitalPin digital_pin)
 {
     return digital_pin.register_address + 2;
 };
 
+/** It sets the logic level of a bit in a register to the desired value
+ * @param register_address The address of a register
+ * @param bit_offset The index of the bit to set in the register
+ * @param level_to_set A Level enum variant (LOW, HIGH) that represent the desired level
+ */
 static inline void write_register_bit(unsigned int register_address,
                                       unsigned char bit_offset,
                                       enum Level level_to_set)
@@ -71,6 +99,12 @@ static inline void write_register_bit(unsigned int register_address,
         *register_pointer &= ~mask;
     }
 };
+
+/** It reads the logic level of a bit in a register
+ * @param register_address The address of a register
+ * @param bit_offset The index of the bit to read in the register
+ * @returns A Level enum variant (LOW, HIGH) that indicates the logic level of the bit in the register
+ */
 static inline enum Level read_register_bit(unsigned int register_address,
                                            unsigned char bit_offset)
 {
@@ -87,7 +121,7 @@ void pinMode(unsigned char arduino_pin_number, enum Mode mode)
 {
     /*
         Usage:
-            pinMode(D0|D2|..|D13, OUTPUT|INPUT_PULLUP|INPUT_TRISTATE)
+            pinMode(0..13, OUTPUT|INPUT_PULLUP|INPUT_TRISTATE)
     */
     struct DigitalPin digital_pin = get_digital_pin_from_number(arduino_pin_number);
     unsigned int ddr_address = get_data_direction_register_address(digital_pin);
