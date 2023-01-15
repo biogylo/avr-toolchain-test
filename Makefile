@@ -1,19 +1,21 @@
 CC=avr-gcc
+ARDUINO_SERIAL_PORT=/dev/ttyUSB0
+
 all:
-	make info
 	make clean
 	make compile
+	make info
 	make launch
 
-compile: source/main.c
-	$(CC) -mmcu=atmega328p source/main.c --output build/main.o -nodevicelib
+compile: 
+	$(CC) -mmcu=atmega328p source/*.c --output build/main.o -nodevicelib
 
 launch:
 	avrdude \
 		-v \
 		-p atmega328p \
 		-c arduino \
-		-P /dev/ttyUSB0 \
+		-P ${ARDUINO_SERIAL_PORT} \
 		-U build/main.o
 
 clean:

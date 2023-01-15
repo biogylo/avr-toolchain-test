@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "hal.h": "c",
+        "io.h": "c",
+        "arduino_uno_io.h": "c"
+    }
+}
