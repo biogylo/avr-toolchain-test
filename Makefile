@@ -8,6 +8,7 @@ all:
 	make launch
 
 compile: 
+	mkdir -p build
 	$(CC) -mmcu=atmega328p source/*.c --output build/main.o -nodevicelib
 
 launch:
